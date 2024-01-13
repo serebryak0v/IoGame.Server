@@ -1,0 +1,6 @@
+@IoGame.Server_HostAddress = http://localhost:5076
+
+GET {{IoGame.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
