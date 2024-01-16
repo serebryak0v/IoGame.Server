@@ -4,11 +4,18 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace IoGame.Server;
 
-public class GameLoopHostedService(
-    IGameService gameService,
-    IHubContext<GameHub, IGameHub> hubContext)
-    : IHostedService, IDisposable
+public class GameLoopHostedService : IHostedService, IDisposable
 {
+    readonly IGameService _gameService;
+    readonly IHubContext<GameHub, IGameHub> _hubContext;
+
+    public GameLoopHostedService(
+        IGameService gameService,
+        IHubContext<GameHub, IGameHub> hubContext)
+    {
+        _gameService = gameService;
+        _hubContext = hubContext;
+    }
     readonly CancellationTokenSource _cts = new();
     PeriodicTimer Timer { get; init; } = new(TimeSpan.FromMilliseconds(GameLoopSettings.FramesPerSecond));
     Task ExecutingTask { get; set; }
@@ -46,13 +53,20 @@ public class GameLoopHostedService(
 
     private async Task UpdateGame()
     {
-        var game = gameService.GetGame();
+        var game = _gameService.Game;
         game.Update();
 
-        foreach (var player in game.Players)
+        try
         {
-            var gameUpdate = game.CreateUpdate(player);
-            await hubContext.Clients.Client(player.Id).GameUpdate(gameUpdate);
+            foreach (var player in game.Players)
+            {
+                var gameUpdate = game.CreateUpdate(player);
+                await _hubContext.Clients.Client(player.Id).GameUpdate(gameUpdate);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex.Message);
         }
     }
 

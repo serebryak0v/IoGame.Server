@@ -1,3 +1,3 @@
-export const clientCalls = {
-  messageReceived: "messageReceived"
+export class ClientCalls {
+  static gameUpdate = "gameUpdate"
 }

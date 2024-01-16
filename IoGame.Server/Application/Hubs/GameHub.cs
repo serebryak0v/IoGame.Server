@@ -1,26 +1,29 @@
 ﻿using IoGame.Server.Application.Dto;
 using IoGame.Server.Application.Services;
-using MessagePack;
 using Microsoft.AspNetCore.SignalR;
 
 namespace IoGame.Server.Application.Hubs;
 
 public interface IGameHub
 {
-    Task Join();
     Task GameUpdate(GameDto game);
 }
 
-public class GameHub(IGameService gameService) : Hub<IGameHub>
+public sealed class GameHub : Hub<IGameHub>
 {
-    public Task Join()
+    readonly IGameService _gameService;
+
+    public GameHub(IGameService gameService)
+    {
+        _gameService = gameService;
+    }
+
+    public void Join()
     {
         var connectionId = Context.ConnectionId;
 
-        gameService.AddPlayer(connectionId);
+        _gameService.AddPlayer(connectionId);
 
         Context.Items["playerId"] = connectionId;
-
-        return Task.CompletedTask;
     }
 }

@@ -1,3 +1,5 @@
-export const serverCalls = {
-  sendMessage: "sendMessage"
+export class ServerCalls {
+  static sendMessage = "sendMessage"
+  static join = "Join"
+  static changeDirection = "changeDirection"
 }

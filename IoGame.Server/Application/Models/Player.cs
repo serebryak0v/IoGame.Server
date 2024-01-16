@@ -5,9 +5,10 @@ namespace IoGame.Server.Application.Models;
 
 public class Player : GameObject
 {
-    private Player(string userName, Point location = default, int speed = 0, double direction = 0)
+    private Player(string connectionId, Point location = default, int speed = 0, double direction = 0)
     {
-        Username = userName;
+        Id = connectionId;
+        Username = connectionId;
         Location = location;
         Speed = speed;
         Direction = direction;
@@ -20,8 +21,8 @@ public class Player : GameObject
         base.Update(distance);
     }
 
-    public static Player Create(string userName, Point startingLocation, int speed, double direction)
+    public static Player Create(string connectionId, Point startingLocation, int speed, double direction)
     {
-        return new Player(userName, startingLocation, speed, direction);
+        return new Player(connectionId, startingLocation, speed, direction);
     }
 }

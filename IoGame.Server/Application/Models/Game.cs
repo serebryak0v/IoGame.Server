@@ -51,7 +51,7 @@ public sealed class Game
         return new GameDto
         {
             CurrentPlayer = player.ToDto(),
-            Players = _players.Values.ToDto(),
+            Players = _players.Values.Where(p => p.Id != player.Id).ToDto(),
             T = _timeDifference
         };
     }

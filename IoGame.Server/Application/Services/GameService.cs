@@ -5,26 +5,21 @@ namespace IoGame.Server.Application.Services;
 
 public interface IGameService
 {
-    Game GetGame();
-
+    Game Game { get; }
     Player AddPlayer(string connectionId);
 }
 
 public class GameService : IGameService
 {
-    public Game Game { get; set; }
+    Game _game = new();
+    public Game Game => _game;
 
     public Player AddPlayer(string connectionId)
     {
-        var game = GetGame();
+        var game = Game;
 
         var player = game.AddPlayer(connectionId);
 
         return player;
-    }
-
-    public Game GetGame()
-    {
-        return Game ?? new Game();
     }
 }
