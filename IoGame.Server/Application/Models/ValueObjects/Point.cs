@@ -1,3 +1,6 @@
-﻿namespace IoGame.Server.Application.Models.ValueObjects;
+﻿using MessagePack;
 
-public readonly record struct Point(int X = 0, int Y = 0);
+namespace IoGame.Server.Application.Models.ValueObjects;
+
+[MessagePackObject]
+public readonly record struct Point([property: Key("x")]int X = 0, [property: Key("y")]int Y = 0);

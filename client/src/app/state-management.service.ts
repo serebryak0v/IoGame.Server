@@ -107,5 +107,9 @@ export class StateManagementService {
       return d1 + (d2 - d1) * ratio;
     }
   }
+
+  changeDirection(direction: number) {
+    this.gameHubService.changeDirection(direction)
+  }
 }
 

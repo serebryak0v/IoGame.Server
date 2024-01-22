@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from "@angular/core"
-import { interval, Subscription } from "rxjs"
+import { filter, fromEvent, interval, map, merge, Subscription, throttleTime } from "rxjs"
 import { Player, State } from "../connectionManagement/game-hub.service"
 import { StateManagementService } from "../state-management.service"
 
@@ -27,6 +27,8 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     this.renderBackground()
 
     this.renderingSubscription = interval(1000 / 30).subscribe(() => this.render(this.stateService.getCurrentState()))
+
+    this.enableMovement()
   }
 
   render(state: State | null) {
@@ -60,9 +62,10 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   private renderPlayer(currentPlayer: Player): void {
-    const { x, y, dir } = currentPlayer;
-    const canvasX = this.canvas.nativeElement.width / 2 + x - currentPlayer.x;
-    const canvasY = this.canvas.nativeElement.height / 2 + y - currentPlayer.y;
+    const { location: {x, y}, dir } = currentPlayer;
+    console.log(currentPlayer)
+    const canvasX = x;
+    const canvasY = y;
 
     if (!this.canvasContext) {
       return;
@@ -76,5 +79,52 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     if(this.renderingSubscription) {
       this.renderingSubscription.unsubscribe()
     }
+  }
+
+  private enableMovement() {
+    // merge(
+    //   fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'w')),
+    //   fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'a')),
+    //   fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 's')),
+    //   fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'd'))
+    // ).subscribe((e) =>
+    //
+    //   this.stateService.movePlayer()
+    // )
+
+    merge(
+      fromEvent<MouseEvent>(window, 'mousestart'),
+      fromEvent<MouseEvent>(window, 'mousemove'),
+      fromEvent<TouchEvent>(window, 'touchmove'),
+      fromEvent<TouchEvent>(window, 'touchstart')
+    )
+      .pipe(
+        throttleTime(50),
+        map((event) => {
+          if (event instanceof MouseEvent) {
+            const mouseEvent = event as MouseEvent;
+
+            return {
+              x: mouseEvent.clientX,
+              y: mouseEvent.clientY,
+            };
+          } else if (window.TouchEvent && event instanceof TouchEvent) {
+            const touchEvent = event as TouchEvent;
+
+            return {
+              x: touchEvent.touches[0].clientX,
+              y: touchEvent.touches[0].clientY,
+            };
+          }
+
+          return null;
+        })
+      )
+      .subscribe((coordinates) => {
+        if (coordinates) {
+          const direction = Math.atan2(coordinates.x - window.innerWidth / 2, window.innerHeight / 2 - coordinates.y);
+          this.stateService.changeDirection(direction);
+        }
+      });
   }
 }

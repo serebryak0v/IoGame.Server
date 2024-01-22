@@ -6,6 +6,11 @@ import { environment } from "../../environments/environment"
 import { ClientCalls } from "./clientCalls"
 import { ServerCalls } from "./serverCalls"
 
+export interface Location {
+  x: number
+  y: number
+}
+
 export interface State {
   t: number
   currentPlayer: Player
@@ -18,8 +23,7 @@ export interface Player extends GameObject {
 export interface GameObject {
   id: string
   dir: number
-  x: number
-  y: number
+  location: Location
 }
 
 @Injectable({
@@ -54,7 +58,7 @@ export class GameHubService {
     await this.hubConnection.send(ServerCalls.changeDirection, direction);
   }
 
-  start() {
+  public start() {
     this.hubConnection.start().then(() => this.startGame())
   }
 

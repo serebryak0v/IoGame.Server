@@ -38,7 +38,7 @@ public sealed class Game
 
     public Player AddPlayer(string connectionId)
     {
-        var player = Player.Create(connectionId, new Point(), 0, 0);
+        var player = Player.Create(connectionId, new Point(1000, 400), 1, 0);
 
         _players[connectionId] = player;
 
@@ -54,5 +54,10 @@ public sealed class Game
             Players = _players.Values.Where(p => p.Id != player.Id).ToDto(),
             T = _timeDifference
         };
+    }
+
+    public void RemovePlayer(string connectionId)
+    {
+        _players.TryRemove(connectionId, out var player);
     }
 }

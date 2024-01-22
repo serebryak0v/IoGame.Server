@@ -26,4 +26,18 @@ public sealed class GameHub : Hub<IGameHub>
 
         Context.Items["playerId"] = connectionId;
     }
+
+    public void ChangeDirection(double direction)
+    {
+        var player = _gameService.Game.Players.FirstOrDefault(p => p.Id == Context.ConnectionId);
+        player?.SetDirection(direction);
+    }
+
+    public override async Task OnDisconnectedAsync(Exception exception)
+    {
+        _gameService
+            .Disconnect(Context.ConnectionId);
+
+        await base.OnDisconnectedAsync(exception);
+    }
 }
