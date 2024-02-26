@@ -1,0 +1,1 @@
+namespace IoGame.Server.Application.Models.ValueObjects;

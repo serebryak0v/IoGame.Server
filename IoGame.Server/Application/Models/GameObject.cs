@@ -2,9 +2,14 @@
 
 namespace IoGame.Server.Application.Models;
 
-public abstract class GameObject
+public abstract class GameObject<TId> where TId : IEquatable<TId>
 {
-    public string Id { get; init; }
+    protected GameObject(TId id)
+    {
+        Id = id;
+    }
+
+    public TId Id { get; set; }
     public Point Location { get; set; }
     public int Speed { get; init; }
     public double Direction { get; set; }
@@ -16,7 +21,7 @@ public abstract class GameObject
             (int)(Location.Y - Speed * distance * Math.Cos(Direction)));
     }
 
-    public double DistanceTo(GameObject obj)
+    public double DistanceTo(GameObject<TId> obj)
     {
         var dx = obj.Location.X - @obj.Location.X;
         var dy = obj.Location.Y - @obj.Location.Y;

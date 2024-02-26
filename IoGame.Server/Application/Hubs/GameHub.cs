@@ -1,4 +1,6 @@
 ﻿using IoGame.Server.Application.Dto;
+using IoGame.Server.Application.Models.Enums;
+using IoGame.Server.Application.Models.ValueObjects;
 using IoGame.Server.Application.Services;
 using Microsoft.AspNetCore.SignalR;
 
@@ -22,15 +24,20 @@ public sealed class GameHub : Hub<IGameHub>
     {
         var connectionId = Context.ConnectionId;
 
-        _gameService.AddPlayer(connectionId);
+        var player = _gameService.AddPlayer(connectionId);
 
-        Context.Items["playerId"] = connectionId;
+        Context.Items["playerId"] = player.Id.Value;
     }
 
-    public void ChangeDirection(double direction)
+    public void MoveIntoDirection(int direction)
     {
-        var player = _gameService.Game.Players.FirstOrDefault(p => p.Id == Context.ConnectionId);
-        player?.SetDirection(direction);
+        var playerId = Context.Items["playerId"];
+
+        if (playerId == null)
+            return;
+
+        var player = _gameService.Game.Players.FirstOrDefault(p => p.Id.Value == (Guid) playerId);
+        player.MoveIntoDirection((Direction) direction);
     }
 
     public override async Task OnDisconnectedAsync(Exception exception)

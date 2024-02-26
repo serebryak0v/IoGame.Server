@@ -61,7 +61,7 @@ public class GameLoopHostedService : IHostedService, IDisposable
             foreach (var player in game.Players)
             {
                 var gameUpdate = game.CreateUpdate(player);
-                await _hubContext.Clients.Client(player.Id).GameUpdate(gameUpdate);
+                await _hubContext.Clients.Client(player.ConnectionId).GameUpdate(gameUpdate);
             }
         }
         catch (Exception ex)

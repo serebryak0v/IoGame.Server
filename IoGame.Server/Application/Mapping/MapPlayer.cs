@@ -10,7 +10,7 @@ public static class MapPlayer
         return new PlayerDto
         {
             Direction = player.Direction,
-            Id = player.Id,
+            Id = player.Id.ToString(),
             Location = player.Location
         };
     }

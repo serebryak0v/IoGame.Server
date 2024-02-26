@@ -24,9 +24,8 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
 
     this.canvas.nativeElement.width = window.innerWidth;
     this.canvas.nativeElement.height = window.innerHeight;
-    this.renderBackground()
 
-    this.renderingSubscription = interval(1000 / 30).subscribe(() => this.render(this.stateService.getCurrentState()))
+    this.renderingSubscription = interval(1000 / 60).subscribe(() => this.render(this.stateService.getCurrentState()))
 
     this.enableMovement()
   }
@@ -34,6 +33,7 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
   render(state: State | null) {
     if (state == null) return
 
+    this.renderBackground()
     this.renderPlayer(state.currentPlayer);
     state.players.forEach((p) => this.renderPlayer(p));
   }
@@ -52,6 +52,7 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
+    this.canvasContext.save();
     this.canvasContext.beginPath();
     this.canvasContext.arc(centerX, centerY, 10, 0, 2 * Math.PI, false);
     this.canvasContext.fillStyle = 'green';
@@ -59,11 +60,11 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     this.canvasContext.lineWidth = 5;
     this.canvasContext.strokeStyle = '#003300';
     this.canvasContext.stroke();
+    this.canvasContext.restore();
   }
 
   private renderPlayer(currentPlayer: Player): void {
     const { location: {x, y}, dir } = currentPlayer;
-    console.log(currentPlayer)
     const canvasX = x;
     const canvasY = y;
 
@@ -72,7 +73,6 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     }
 
     this.drawPlayerCircle(canvasX, canvasY)
-    this.canvasContext.restore();
   }
 
   ngOnDestroy() {
@@ -82,49 +82,14 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   private enableMovement() {
-    // merge(
-    //   fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'w')),
-    //   fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'a')),
-    //   fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 's')),
-    //   fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'd'))
-    // ).subscribe((e) =>
-    //
-    //   this.stateService.movePlayer()
-    // )
-
     merge(
-      fromEvent<MouseEvent>(window, 'mousestart'),
-      fromEvent<MouseEvent>(window, 'mousemove'),
-      fromEvent<TouchEvent>(window, 'touchmove'),
-      fromEvent<TouchEvent>(window, 'touchstart')
+      fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'w')),
+      fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'a')),
+      fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 's')),
+      fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'd'))
+    ).pipe((throttleTime(50))).subscribe((e) =>
+
+      this.stateService.movePlayer(e)
     )
-      .pipe(
-        throttleTime(50),
-        map((event) => {
-          if (event instanceof MouseEvent) {
-            const mouseEvent = event as MouseEvent;
-
-            return {
-              x: mouseEvent.clientX,
-              y: mouseEvent.clientY,
-            };
-          } else if (window.TouchEvent && event instanceof TouchEvent) {
-            const touchEvent = event as TouchEvent;
-
-            return {
-              x: touchEvent.touches[0].clientX,
-              y: touchEvent.touches[0].clientY,
-            };
-          }
-
-          return null;
-        })
-      )
-      .subscribe((coordinates) => {
-        if (coordinates) {
-          const direction = Math.atan2(coordinates.x - window.innerWidth / 2, window.innerHeight / 2 - coordinates.y);
-          this.stateService.changeDirection(direction);
-        }
-      });
   }
 }

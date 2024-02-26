@@ -1,6 +1,14 @@
 import { Injectable } from "@angular/core"
 import { GameHubService, GameObject, State } from "./connectionManagement/game-hub.service"
 
+export enum Direction {
+  Up,
+  Down,
+  Left,
+  Right
+}
+
+
 @Injectable({
   providedIn: "root"
 })
@@ -46,6 +54,19 @@ export class StateManagementService {
         currentPlayer: this.interpolateObject(baseUpdate.currentPlayer, next.currentPlayer, ratio),
         players: this.interpolateObjectArray(baseUpdate.players, next.players, ratio),
       };
+    }
+  }
+
+  movePlayer(e: KeyboardEvent) {
+    console.log(e)
+    if (e.key === "w") {
+      this.gameHubService.moveIntoDirection(Direction.Up)
+    } else if (e.key === "s") {
+      this.gameHubService.moveIntoDirection(Direction.Down)
+    } else if (e.key === "a") {
+      this.gameHubService.moveIntoDirection(Direction.Left)
+    } else if (e.key === "d") {
+      this.gameHubService.moveIntoDirection(Direction.Right)
     }
   }
 
@@ -106,10 +127,6 @@ export class StateManagementService {
       // Normal interp
       return d1 + (d2 - d1) * ratio;
     }
-  }
-
-  changeDirection(direction: number) {
-    this.gameHubService.changeDirection(direction)
   }
 }
 

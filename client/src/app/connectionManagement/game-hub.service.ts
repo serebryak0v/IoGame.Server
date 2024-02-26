@@ -3,6 +3,7 @@ import { HttpTransportType, HubConnection, HubConnectionBuilder, HubConnectionSt
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack"
 import { BehaviorSubject, Observable } from "rxjs"
 import { environment } from "../../environments/environment"
+import { Direction } from "../state-management.service"
 import { ClientCalls } from "./clientCalls"
 import { ServerCalls } from "./serverCalls"
 
@@ -53,9 +54,9 @@ export class GameHubService {
     await this.hubConnection.send(ServerCalls.join);
   }
 
-  public async changeDirection(direction: number) {
+  public async moveIntoDirection(direction: Direction) {
     this.ensureConnected()
-    await this.hubConnection.send(ServerCalls.changeDirection, direction);
+    await this.hubConnection.send(ServerCalls.moveIntoDirection, direction);
   }
 
   public start() {
