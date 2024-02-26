@@ -51,4 +51,9 @@ public class Player : GameObject<PlayerId>
     {
         Direction2 = direction;
     }
+
+    public void Move(bool isMoving)
+    {
+        Speed = isMoving ? 5 : 0;
+    }
 }

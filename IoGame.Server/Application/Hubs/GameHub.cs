@@ -29,6 +29,17 @@ public sealed class GameHub : Hub<IGameHub>
         Context.Items["playerId"] = player.Id.Value;
     }
 
+    public void Move(bool isMoving)
+    {
+        var playerId = Context.Items["playerId"];
+
+        if (playerId == null)
+            return;
+
+        var player = _gameService.Game.Players.FirstOrDefault(p => p.Id.Value == (Guid) playerId);
+        player.Move(isMoving);
+    }
+
     public void MoveIntoDirection(int direction)
     {
         var playerId = Context.Items["playerId"];

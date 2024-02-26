@@ -63,6 +63,16 @@ export class GameHubService {
     this.hubConnection.start().then(() => this.startGame())
   }
 
+  public async startMoving() {
+    this.ensureConnected()
+    await this.hubConnection.send(ServerCalls.move,true);
+  }
+
+  public async stopMoving() {
+    this.ensureConnected()
+    await this.hubConnection.send(ServerCalls.move, false);
+  }
+
   private registerClientCalls() {
     this.hubConnection.on(ClientCalls.gameUpdate, (data: State) => {
       this.stateUpdateSubject$.next(data)

@@ -3,4 +3,5 @@ export class ServerCalls {
   static join = "Join"
   static moveIntoDirection = "moveIntoDirection"
   static disconnect = "disconnect"
+  static move = "move"
 }

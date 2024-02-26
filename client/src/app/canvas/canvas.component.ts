@@ -22,8 +22,8 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.canvasContext = this.canvas.nativeElement.getContext("2d")
 
-    this.canvas.nativeElement.width = window.innerWidth;
-    this.canvas.nativeElement.height = window.innerHeight;
+    this.canvas.nativeElement.width = window.innerWidth
+    this.canvas.nativeElement.height = window.innerHeight
 
     this.renderingSubscription = interval(1000 / 60).subscribe(() => this.render(this.stateService.getCurrentState()))
 
@@ -31,65 +31,78 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   render(state: State | null) {
-    if (state == null) return
+    if (state == null) {
+      return
+    }
 
     this.renderBackground()
-    this.renderPlayer(state.currentPlayer);
-    state.players.forEach((p) => this.renderPlayer(p));
+    this.renderPlayer(state.currentPlayer)
+    state.players.forEach((p) => this.renderPlayer(p))
   }
 
   private renderBackground() {
     if (!this.canvasContext) {
-      return;
+      return
     }
 
-    this.canvasContext.fillStyle = "grey";
-    this.canvasContext.fillRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+    this.canvasContext.fillStyle = "grey"
+    this.canvasContext.fillRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height)
   }
 
   private drawPlayerCircle(centerX: number, centerY: number) {
     if (!this.canvasContext) {
-      return;
+      return
     }
 
-    this.canvasContext.save();
-    this.canvasContext.beginPath();
-    this.canvasContext.arc(centerX, centerY, 10, 0, 2 * Math.PI, false);
-    this.canvasContext.fillStyle = 'green';
-    this.canvasContext.fill();
-    this.canvasContext.lineWidth = 5;
-    this.canvasContext.strokeStyle = '#003300';
-    this.canvasContext.stroke();
-    this.canvasContext.restore();
+    this.canvasContext.save()
+    this.canvasContext.beginPath()
+    this.canvasContext.arc(centerX, centerY, 10, 0, 2 * Math.PI, false)
+    this.canvasContext.fillStyle = "green"
+    this.canvasContext.fill()
+    this.canvasContext.lineWidth = 5
+    this.canvasContext.strokeStyle = "#003300"
+    this.canvasContext.stroke()
+    this.canvasContext.restore()
   }
 
   private renderPlayer(currentPlayer: Player): void {
-    const { location: {x, y}, dir } = currentPlayer;
-    const canvasX = x;
-    const canvasY = y;
+    const {location: {x, y}, dir} = currentPlayer
+    const canvasX = x
+    const canvasY = y
 
     if (!this.canvasContext) {
-      return;
+      return
     }
 
     this.drawPlayerCircle(canvasX, canvasY)
   }
 
   ngOnDestroy() {
-    if(this.renderingSubscription) {
+    if (this.renderingSubscription) {
       this.renderingSubscription.unsubscribe()
     }
   }
 
   private enableMovement() {
     merge(
-      fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'w')),
-      fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'a')),
-      fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 's')),
-      fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter((e: KeyboardEvent) => e.key === 'd'))
-    ).pipe((throttleTime(50))).subscribe((e) =>
-
+      fromEvent<KeyboardEvent>(document, "keydown").pipe(filter((e: KeyboardEvent) => e.key === "w")),
+      fromEvent<KeyboardEvent>(document, "keydown").pipe(filter((e: KeyboardEvent) => e.key === "a")),
+      fromEvent<KeyboardEvent>(document, "keydown").pipe(filter((e: KeyboardEvent) => e.key === "s")),
+      fromEvent<KeyboardEvent>(document, "keydown").pipe(filter((e: KeyboardEvent) => e.key === "d"))
+    ).pipe((throttleTime(50))).subscribe((e) => {
+      this.stateService.move()
       this.stateService.movePlayer(e)
+    }
+  )
+
+    merge(
+      fromEvent<KeyboardEvent>(document, "keyup").pipe(filter((e: KeyboardEvent) => e.key === "w")),
+      fromEvent<KeyboardEvent>(document, "keyup").pipe(filter((e: KeyboardEvent) => e.key === "a")),
+      fromEvent<KeyboardEvent>(document, "keyup").pipe(filter((e: KeyboardEvent) => e.key === "s")),
+      fromEvent<KeyboardEvent>(document, "keyup").pipe(filter((e: KeyboardEvent) => e.key === "d"))
+    ).pipe((throttleTime(50))).subscribe((e) => {
+      this.stateService.stopMoving()
+      }
     )
   }
 }

@@ -38,7 +38,7 @@ public sealed class Game
 
     public Player AddPlayer(string connectionId)
     {
-        var player = Player.Create(connectionId, new Point(1000, 400), 1, 0);
+        var player = Player.Create(connectionId, new Point(1000, 400), 0, 0);
 
         _players[connectionId] = player;
 

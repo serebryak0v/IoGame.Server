@@ -11,7 +11,7 @@ public abstract class GameObject<TId> where TId : IEquatable<TId>
 
     public TId Id { get; set; }
     public Point Location { get; set; }
-    public int Speed { get; init; }
+    public int Speed { get; set; }
     public double Direction { get; set; }
 
     public virtual void Update(double distance)

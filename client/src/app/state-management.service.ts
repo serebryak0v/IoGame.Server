@@ -70,6 +70,14 @@ export class StateManagementService {
     }
   }
 
+  move() {
+    this.gameHubService.startMoving()
+  }
+
+  stopMoving() {
+    this.gameHubService.stopMoving()
+  }
+
   private currentServerTime(): number {
     return this.firstServerTimestamp + (Date.now() - this.gameStart) - this.renderDelayInMS;
   }
